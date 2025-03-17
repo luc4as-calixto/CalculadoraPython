@@ -1,40 +1,32 @@
 from tkinter import *
+import re
 
 conta = "0"
 historico = ""
 
 #funções
 
-def equação(num):
+def equacao(num):
     global label, historico, conta, labelhistorico
-    import re 
 
-    partes = re.split(r'([\+\-\*/%])', conta)
-    partes = [p.strip() for p in partes if p.strip()]
-    
-    if len(partes) < 3:
-        return conta 
-
-    n1 = float(partes[0])
-    n2 = float(partes[2])
-    sinal = partes[1]
-
-    if sinal == "+":
-        historico = str(n1 + n2)
-    elif sinal == "-":
-        historico = str(n1 - n2)
-    elif sinal == "*":
-        historico = str(n1 * n2)
-    elif sinal == "/":
-        historico = str(n1 / n2)
-    elif sinal == "%":
-        historico = str(n1 % n2)
-    else:
-        return conta  
-
-    labelhistorico['text'] = historico
-    label['text'] = historico + num 
-    conta = historico 
+    try:
+        conta = conta.strip()
+        
+        # Validar a expressão matemática
+        if not re.match(r'^[\d\+\-\*/%\(\)]+$', conta):
+            return conta  # Retorna a expressão original se for inválida
+        
+        # Resolver a equação com eval()
+        resultado = str(eval(conta))
+        
+        historico = resultado
+        labelhistorico['text'] = historico
+        label['text'] = historico + num
+        conta = historico + num
+    except Exception as e:
+        print("Erro:", e)
+        label['text'] = "Erro"
+        conta = "0"
 
 
 def numeros(num):
@@ -52,7 +44,7 @@ def numeros(num):
 
 def funcPonto(num = '.'):
     global conta, label 
-    if conta[-1] == '.' or conta[-1] == '+' or conta[-1] == '-' or conta[-1] == '*' or conta[-1] == '/' or conta[-1] == '%' or conta[-1] == '(' or conta[-1] == ')' or conta == 'Erro' or len(label['text']) >= 23 or conta.count('.') > 0:
+    if conta[-1] == '.' or conta[-1] == '+' or conta[-1] == '-' or conta[-1] == '*' or conta[-1] == '/' or conta[-1] == '%' or conta[-1] == '(' or conta[-1] == ')' or conta == 'Erro' or len(label['text']) >= 23:
         return
     elif len(label['text']) <= 22:
         label['text'] += str(num)   
@@ -60,45 +52,94 @@ def funcPonto(num = '.'):
 
 def funcAbreParente(num = '('):
     global conta, label
-    if label['text'] == '0' or len(label['text']) >= 20:
+    if label['text'] == '0' or label['text'] == 'Erro':
         label['text'] = ""
         label['text'] += str(num)
         conta = ""
         conta += str(num)
+    elif label['text'][-1].isdigit():
+        return
     elif len(label['text']) <= 22:
-        label['text'] += str(num)
-        conta += str(num)
+        if label['text'][-1] == '.':
+            label['text'] += "0"
+            conta += "0"
+            label['text'] += str(num)
+            conta += str(num)
+        else:
+            label['text'] += str(num)
+            conta += str(num)
 
 def funcFechaParente(num = ')'):
     global conta, label
-    if conta.count('(') > conta.count(')') or len(label['text']) >= 23:
+    if conta[-1] == '.' or conta[-1] == '+' or conta[-1] == '-' or conta[-1] == '*' or conta[-1] == '/' or conta[-1] == '%' or conta[-1] == '(' or conta[-1] == ')' or conta == 'Erro':
+        return
+    elif conta.count('(') > conta.count(')') or len(label['text']) >= 23:
         label['text'] += str(num)
         conta += str(num)
 
+# def operador(num):
+#     global conta, label
+#     if conta[-1] not in "+-*/%(" and len(label['text']) < 25:
+#         if label['text'][-1] == ".":
+#             label['text'] += "0"
+#             conta += "0"
+#             label['text'] += str(num)
+#             conta += str(num)
+#         elif (conta.count('*') > 0) or (conta.count('/') > 0) or (conta.count('+') > 0) or (conta.count('-') > 0) or (conta.count('%') > 0) :
+#             if conta.count('(') > conta.count(')'):
+#                 label['text'] += str(num)
+#                 conta += str(num)
+#             elif label['text'][-1] == ')':
+#                 equacao(num)
+#             else:
+#                 equacao(num) 
+#         else:
+#             label['text'] += str(num)
+#             conta += str(num)
+
+
 def operador(num):
     global conta, label
-    if label['text'][-1] == '%' or label['text'][-1] == '+' or label['text'][-1] == '-' or label['text'][-1] == '*' or label['text'][-1] == '/' or label['text'][-1] == '(' or label['text'] == 'Erro' or len(label['text']) >= 25:
+
+    # Impede a inserção de dois operadores consecutivos
+    if conta[-1] in "+-*/%(" or len(label['text']) >= 25:
         return
-    elif(conta.count('*') > 0) or (conta.count('/') > 0) or (conta.count('+') > 0) or (conta.count('-') > 0) or (conta.count('%') > 0):
-        equação(num)   
+
+    # Se o último caractere for um ponto, adiciona "0" antes do operador
+    if label['text'][-1] == ".":
+        label['text'] += "0"
+        conta += "0"
+
+    # Se a conta contém operadores e há parênteses abertos
+    if any(op in conta for op in "+-*/%") and conta.count('(') > conta.count(')'):
+        if label['text'][-1] == ')':
+            label['text'] += str(num)
+            conta += str(num)
+            equacao(num)
+        else:
+            label['text'] += str(num)
+            conta += str(num)
+            equacao(num)
+    # Caso contrário, apenas adiciona o operador normalmente
     else:
         label['text'] += str(num)
         conta += str(num)
+
+
         
-def limpartudo(num = 'CE'):
+def limpartudo():
     global conta, label
     label['text'] = '0'
     conta = '0'
 
-def resultado(num = '='):
+def resultado():
     global conta, label
     try:
-        label['text'] = str (eval(conta))
+        label['text'] = str(eval(conta))
         conta = str(eval(conta))
     except:
         label['text'] = 'Erro'
         conta = '0'
-
 
 
 # abre a janela no tkinter
