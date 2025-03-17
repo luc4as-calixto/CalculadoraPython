@@ -110,6 +110,8 @@ def operador(num):
     # Se a conta contém operadores e há parênteses abertos
     if any(op in conta for op in "+-*/%") and conta.count('(') > 0:
         if label['text'][-1] == ')':
+            equacao(num)
+        elif label['text'][-1] == '+' or label['text'][-1] == '-' or label['text'][-1] == '*' or label['text'][-1] == '/' or label['text'][-1] == '%':
             label['text'] += str(num)
             conta += str(num)
             equacao(num)
