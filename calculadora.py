@@ -114,12 +114,11 @@ def operador(num):
     if any(op in conta for op in "+-*/%") and conta.count('(') > conta.count(')'):
         if label['text'][-1] == ')':
             label['text'] += str(num)
-            conta += str(num)
+            conta += str(num)  
             equacao(num)
         else:
             label['text'] += str(num)
-            conta += str(num)
-            equacao(num)
+            conta += str(num)            
     # Caso contrário, apenas adiciona o operador normalmente
     else:
         label['text'] += str(num)
@@ -127,19 +126,19 @@ def operador(num):
 
 
         
-def limpartudo():
-    global conta, label
-    label['text'] = '0'
-    conta = '0'
+def limpartudo(num = 'CE'):
+     global conta, label
+     label['text'] = '0'
+     conta = '0'
 
-def resultado():
-    global conta, label
-    try:
-        label['text'] = str(eval(conta))
-        conta = str(eval(conta))
-    except:
-        label['text'] = 'Erro'
-        conta = '0'
+def resultado(num = '='):
+     global conta, label
+     try:
+         label['text'] = str (eval(conta))
+         conta = str(eval(conta))
+     except:
+         label['text'] = 'Erro'
+         conta = '0'
 
 
 # abre a janela no tkinter
