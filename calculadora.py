@@ -1,5 +1,5 @@
 from tkinter import *
-import re
+import re 
 
 conta = "0"
 historico = ""
@@ -35,10 +35,7 @@ def numeros(num):
         label['text'] = str(num)
         conta = ""
         conta += str(num)
-    elif len(label['text']) <= 22:
-        label['text'] += str(num)
-        conta += str(num)
-    elif conta[-1] == '.' or conta[-1] == '+' or conta[-1] == '-' or conta[-1] == '*' or conta[-1] == '/' or conta[-1] == '%' or conta[-1] == '(' or conta[-1] == ')' and len(label['text']) <= 28:
+    elif conta[-1] == '.' or conta[-1] == '+' or conta[-1] == '-' or conta[-1] == '*' or conta[-1] == '/' or conta[-1] == '%' or conta[-1] == '(' and len(label['text']) <= 28:
         label['text'] += str(num)
         conta += str(num)
 
@@ -111,10 +108,10 @@ def operador(num):
         conta += "0"
 
     # Se a conta contém operadores e há parênteses abertos
-    if any(op in conta for op in "+-*/%") and conta.count('(') > conta.count(')'):
+    if any(op in conta for op in "+-*/%") and conta.count('(') > 0:
         if label['text'][-1] == ')':
             label['text'] += str(num)
-            conta += str(num)  
+            conta += str(num)
             equacao(num)
         else:
             label['text'] += str(num)
