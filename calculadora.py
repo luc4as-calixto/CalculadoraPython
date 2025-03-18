@@ -38,6 +38,9 @@ def numeros(num):
     elif conta[-1] == '.' or conta[-1] == '+' or conta[-1] == '-' or conta[-1] == '*' or conta[-1] == '/' or conta[-1] == '%' or conta[-1] == '(' and len(label['text']) <= 28:
         label['text'] += str(num)
         conta += str(num)
+    else:
+        label['text'] += str(num)
+        conta += str(num)
 
 def funcPonto(num = '.'):
     global conta, label 
