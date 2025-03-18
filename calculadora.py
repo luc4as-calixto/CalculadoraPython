@@ -117,7 +117,6 @@ def operador(num):
         elif label['text'][-1] == '+' or label['text'][-1] == '-' or label['text'][-1] == '*' or label['text'][-1] == '/' or label['text'][-1] == '%':
             label['text'] += str(num)
             conta += str(num)
-            equacao(num)
         else:
             label['text'] += str(num)
             conta += str(num)            
