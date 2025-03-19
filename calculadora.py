@@ -6,39 +6,12 @@ historico = ""
 
 #funções
 
-def equacao(num):
-    global label, historico, conta, labelhistorico
-
-    try:
-        conta = conta.strip()
-        
-        # Validar a expressão matemática
-        if not re.match(r'^[\d\+\-\*/%\(\)]+$', conta):
-            return conta  # Retorna a expressão original se for inválida
-        
-        # Resolver a equação com eval()
-        resultado = str(eval(conta))
-        
-        historico = resultado
-        labelhistorico['text'] = historico
-        label['text'] = historico + num
-        conta = historico + num
-    except Exception as e:
-        print("Erro:", e)
-        label['text'] = "Erro"
-        conta = "0"
-
-
 def numeros(num):
     global conta, label
     if label['text'] == '0' or label['text'] == 'Erro':
         label['text'] = str(num)
-        conta = ""
-        conta += str(num)
-    elif conta[-1] == '.' or conta[-1] == '+' or conta[-1] == '-' or conta[-1] == '*' or conta[-1] == '/' or conta[-1] == '%' or conta[-1] == '(' and len(label['text']) <= 28:
-        label['text'] += str(num)
-        conta += str(num)
-    else:
+        conta = str(num)
+    elif len(label['text']) <= 28:
         label['text'] += str(num)
         conta += str(num)
 
@@ -53,10 +26,8 @@ def funcPonto(num = '.'):
 def funcAbreParente(num = '('):
     global conta, label
     if label['text'] == '0' or label['text'] == 'Erro':
-        label['text'] = ""
-        label['text'] += str(num)
-        conta = ""
-        conta += str(num)
+        label['text'] = str(num)
+        conta = str(num)
     elif label['text'][-1].isdigit():
         return
     elif len(label['text']) <= 22:
@@ -73,58 +44,30 @@ def funcFechaParente(num = ')'):
     global conta, label
     if conta[-1] == '.' or conta[-1] == '+' or conta[-1] == '-' or conta[-1] == '*' or conta[-1] == '/' or conta[-1] == '%' or conta[-1] == '(' or conta[-1] == ')' or conta == 'Erro':
         return
-    elif conta.count('(') > conta.count(')') or len(label['text']) >= 23:
+    elif conta.count('(') > conta.count(')') and len(label['text']) <= 20:
         label['text'] += str(num)
         conta += str(num)
-
-# def operador(num):
-#     global conta, label
-#     if conta[-1] not in "+-*/%(" and len(label['text']) < 25:
-#         if label['text'][-1] == ".":
-#             label['text'] += "0"
-#             conta += "0"
-#             label['text'] += str(num)
-#             conta += str(num)
-#         elif (conta.count('*') > 0) or (conta.count('/') > 0) or (conta.count('+') > 0) or (conta.count('-') > 0) or (conta.count('%') > 0) :
-#             if conta.count('(') > conta.count(')'):
-#                 label['text'] += str(num)
-#                 conta += str(num)
-#             elif label['text'][-1] == ')':
-#                 equacao(num)
-#             else:
-#                 equacao(num) 
-#         else:
-#             label['text'] += str(num)
-#             conta += str(num)
-
 
 def operador(num):
     global conta, label
 
     # Impede a inserção de dois operadores consecutivos
-    if conta[-1] in "+-*/%(" or len(label['text']) >= 25:
-        return
+    if conta[-1] not in "+-*/%" and len(label['text']) <= 22:
+    
+        if num == '-':
+            label['text'] += str(num)
+            conta += str(num)
+            return
 
-    # Se o último caractere for um ponto, adiciona "0" antes do operador
-    if label['text'][-1] == ".":
-        label['text'] += "0"
-        conta += "0"
-
-    # Se a conta contém operadores e há parênteses abertos
-    if any(op in conta for op in "+-*/%") and conta.count('(') > 0:
-        if label['text'][-1] == ')':
-            equacao(num)
-        elif label['text'][-1] == '+' or label['text'][-1] == '-' or label['text'][-1] == '*' or label['text'][-1] == '/' or label['text'][-1] == '%':
+        # Se o último caractere for um ponto, adiciona "0" antes do operador
+        if label['text'][-1] == ".":
+            label['text'] += "0"
+            conta += "0"
             label['text'] += str(num)
             conta += str(num)
         else:
             label['text'] += str(num)
-            conta += str(num)            
-    # Caso contrário, apenas adiciona o operador normalmente
-    else:
-        label['text'] += str(num)
-        conta += str(num)
-
+            conta += str(num)
 
         
 def limpartudo(num = 'CE'):
@@ -133,13 +76,19 @@ def limpartudo(num = 'CE'):
      conta = '0'
 
 def resultado(num = '='):
-     global conta, label
-     try:
-         label['text'] = str (eval(conta))
-         conta = str(eval(conta))
-     except:
-         label['text'] = 'Erro'
-         conta = '0'
+    global conta, label
+    try:
+        if (conta.count('(') != conta.count(')')):
+            label['text'] = ')'
+            conta += ')'
+        resultado = eval(conta)
+        label['text'] = str(resultado)
+        historico = conta + " = " + str(resultado)
+        labelhistorico['text'] = historico
+        conta = str(resultado)
+    except:
+        label['text'] = 'Erro'
+        conta = 'Erro'
 
 
 # abre a janela no tkinter
