@@ -1,5 +1,5 @@
 from tkinter import *
-import re 
+import pyautogui
 
 conta = "0"
 historico = ""
@@ -19,18 +19,17 @@ def funcPonto(num = '.'):
     global conta, label 
     if conta[-1] == '.' or conta[-1] == '+' or conta[-1] == '-' or conta[-1] == '*' or conta[-1] == '/' or conta[-1] == '%' or conta[-1] == '(' or conta[-1] == ')' or conta == 'Erro' or len(label['text']) >= 23:
         return
-    elif len(label['text']) <= 22:
+    elif len(label['text']) <= 26:
         label['text'] += str(num)   
         conta += str(num)
 
 def funcAbreParente(num = '('):
     global conta, label
-    if label['text'] == '0' or label['text'] == 'Erro':
-        label['text'] = str(num)
-        conta = str(num)
+    if label['text'] == '' or label['text'] == 'Erro':
+        return
     elif label['text'][-1].isdigit():
         return
-    elif len(label['text']) <= 22:
+    elif len(label['text']) <= 24:
         if label['text'][-1] == '.':
             label['text'] += "0"
             conta += "0"
@@ -44,12 +43,16 @@ def funcFechaParente(num = ')'):
     global conta, label
     if conta[-1] == '.' or conta[-1] == '+' or conta[-1] == '-' or conta[-1] == '*' or conta[-1] == '/' or conta[-1] == '%' or conta[-1] == '(' or conta[-1] == ')' or conta == 'Erro':
         return
-    elif conta.count('(') > conta.count(')') and len(label['text']) <= 20:
+    elif conta.count('(') > conta.count(')') and len(label['text']) <= 28:
         label['text'] += str(num)
         conta += str(num)
 
 def operador(num):
     global conta, label
+
+    if conta[-1] in "+-*/%":
+        conta = conta[:-1]
+        label['text'] = label['text'][:-1]
 
     # Impede a inserção de dois operadores consecutivos
     if conta[-1] not in "+-*/%" and len(label['text']) <= 22:
@@ -77,19 +80,47 @@ def limpartudo(num = 'CE'):
 
 def resultado(num = '='):
     global conta, label
+    if conta[-1] == '.' or conta[-1] == '+' or conta[-1] == '-' or conta[-1] == '*' or conta[-1] == '/' or conta[-1] == '%' or conta[-1] == '(' or conta == 'Erro':
+        return
+    
     try:
         if (conta.count('(') != conta.count(')')):
             label['text'] = ')'
             conta += ')'
+        resultado = ""
         resultado = eval(conta)
         label['text'] = str(resultado)
         historico = conta + " = " + str(resultado)
+        labelhistorico['text'] = historico
         labelhistorico['text'] = historico
         conta = str(resultado)
     except:
         label['text'] = 'Erro'
         conta = 'Erro'
 
+def on_key_press(event):
+    key = event.char
+    
+    if key in "0123456789":
+        numeros(key)
+    elif key == "+":
+        operador(key)
+    elif key == "-":
+        operador(key)
+    elif key == "*":
+        operador(key)
+    elif key == "/":
+        operador(key)
+    elif key == ".":
+        funcPonto()
+    elif key == "=" or key == "\r":
+        resultado()
+    elif key == "c" or key == "C":
+        limpartudo()
+    elif key == "(":
+        funcAbreParente()
+    elif key == ")":
+        funcFechaParente()
 
 # abre a janela no tkinter
 janela = Tk()
@@ -162,5 +193,6 @@ porcentagem.grid(row=0, column=2)
 limpar = Button(frame, text='CE', font='Arial 12 bold', width=6, height=2, command=lambda: limpartudo('CE'))
 limpar.grid(row=0, column=3)
 
+janela.bind("<KeyPress>", on_key_press)
+
 janela.mainloop()
-print(conta)
