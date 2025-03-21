@@ -77,6 +77,7 @@ def limpartudo(num = 'CE'):
      global conta, label
      label['text'] = '0'
      conta = '0'
+     labelhistorico['text'] = ''
 
 def resultado(num = '='):
     global conta, label
@@ -85,8 +86,9 @@ def resultado(num = '='):
     
     try:
         if (conta.count('(') != conta.count(')')):
-            label['text'] = ')'
-            conta += ')'
+            for i in range(conta.count('(') - conta.count(')')):
+                label['text'] = ')'
+                conta += ')'
         resultado = ""
         resultado = eval(conta)
         label['text'] = str(resultado)
